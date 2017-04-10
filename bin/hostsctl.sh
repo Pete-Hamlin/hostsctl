@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (c) 2017 Levi Sabah <0xl3vi@gmail.com> 
+# Copyright (c) 2017 Levi Sabah <0xl3vi@gmail.com>
 # (https://git.io/hostsctl/)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -58,7 +58,7 @@ USER_HOSTS="${PREFIX}/hostsctl.d/10-hosts"
 hosts_usage() {
 cat << END
 Usage $0 [option] [host] ...
-  
+
 Hostsctl.sh allows you to block ads, social networks, porn, etc,
 by manipulating the /etc/hosts file.
 
@@ -128,7 +128,7 @@ hosts_enable() {
 
   if [ -z ${filename} ];then
     cp ${ENABLED_DISABLED_HOSTS} ${tmpfile} # Copy current version
-    echo "#${ip} $1" >> ${tmpfile} 
+    echo "#${ip} $1" >> ${tmpfile}
     mv "${tmpfile}" "${ENABLED_DISABLED_HOSTS}" # Update
   else
     awk -vhost=$1 \
@@ -157,7 +157,7 @@ hosts_disable() {
 
   if [ -z ${filename} ];then
     cp ${ENABLED_DISABLED_HOSTS} ${tmpfile} # Copy current version
-    echo "${ip} $1" >> ${tmpfile} 
+    echo "${ip} $1" >> ${tmpfile}
     mv "${tmpfile}" "${ENABLED_DISABLED_HOSTS}" # Update
   else
     awk -vhost=$1 \
@@ -172,7 +172,7 @@ hosts_disable() {
 
 # hosts_list_enabled: list enabled hosts
 hosts_list_enabled() {
-  hosts=$(awk '{ if ( substr($0, 1, 3) == "#0." ) printf("%s\n", $2) }' ${ENABLED_DISABLED_HOSTS})
+  hosts=$(awk '{ if ( substr($0, 1, 3) == "#0." ) printf("%s\n", $2) }' ${HOSTS})
   total=0
 
   for host in $hosts;do
@@ -184,7 +184,7 @@ hosts_list_enabled() {
 
 # hosts_list_disabled: list disabled hosts
 hosts_list_disabled() {
-  hosts=$(awk '{ if ( substr($0, 1, 3) == "0.0" ) printf("%s\n", $2) }' ${ENABLED_DISABLED_HOSTS})
+  hosts=$(awk '{ if ( substr($0, 1, 3) == "0.0" ) printf("%s\n", $2) }' ${HOSTS})
   total=0;
 
   for host in $hosts;do
@@ -197,9 +197,11 @@ hosts_list_disabled() {
 # hosts_update_remote: update the remote hosts
 hosts_update_remote() {
   root_check
+  local tmpfile=$(mktemp);
 
-  curl -o "${REMOTE_HOSTS}" -L "${remote_hosts}" -s
-  msg_check "update: ${purple}$(wc -l ${REMOTE_HOSTS} | cut -d' ' -f1)${reset} new entries"
+  curl -o "${tmpfile}" -L "${remote_hosts}" -s
+  msg_check "update: ${purple}$(wc -l ${tmpfile} | cut -d' ' -f1)${reset} entries, ${yellow}$(diff -B ${tmp} ${REMOTE_HOSTS} | wc -l)${reset} new"
+  mv ${tmpfile} ${REMOTE_HOSTS}
 }
 
 case $1 in
