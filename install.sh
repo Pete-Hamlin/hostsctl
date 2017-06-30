@@ -43,10 +43,20 @@ hostsctl_install() {
   # ARCHLINUX
   if [ -f "/etc/arch-release" ];then
     printf "* " && cp -v hostsctl.bash-completion "/usr/share/bash-completion/completions/hostsctl"
+  # UBUNTU - definitely a tidier way of doing this, but such things are a little above me
+  else [ -f "/etc/os-release"]
+    if grep -q 'NAME="Ubuntu"' os-release;then
+        printf "* " && cp -v hostsctl.bash-completion "/usr/share/bash-completion/completions/hostsctl"
+    fi
   fi
 
   printf "\n* congrats! hostsctl.sh installed on your system.\n"
   echo "* to get started, run hostsctl update"
+}
+
+hosts_config() {
+    # Add default config file
+    cp -v etc/hostsctl.conf "/etc/hostsctl"
 }
 
 hosts_uninstall() {
@@ -60,6 +70,10 @@ hosts_uninstall() {
 
   if [ -f "/etc/arch-release" ];then
     rm "/usr/share/bash-completion/completions/hostsctl.bash-completion"
+    else [ -f "/etc/os-release"]
+      if grep -q 'NAME="Ubuntu"' os-release;then
+          rm "/usr/share/bash-completion/completions/hostsctl.bash-completion"
+      fi
   fi
   printf "* hostsctl is no longer installed on your system.\n"
 }
@@ -73,6 +87,7 @@ Install.sh will install hostsctl on your system.
 Arguments:
   --prefix   set installation prefix (default: ${PREFIX})
   uninstall  uninstall hostsctl.
+  init-config installs default config file in /etc/hostsctl
 EOF
 }
 
@@ -83,6 +98,8 @@ case $1 in
     PREFIX="$2";;
   uninstall)
     hosts_uninstall "${PREFIX}";;
+  init-config)
+    hosts_config;;
   *)
     hostsctl_install "${PREFIX}"
 esac

@@ -220,12 +220,14 @@ hosts_list() {
   # file.
   elif [ "$1" = "disabled" ]; then
     match_color=$red
-    match_string="$(echo $ip | awk '{print substr($0,0,3)}')"
-    hosts=$(awk "{ if ( substr(\$0, 1, 3) == \"$match_string\" ) printf(\"%s\n\", \$2) }" $HOSTS)
+     match_string="$(echo $ip | awk '{print substr($0,0,3)}')"
+    hosts=$(grep "^$match_string" "${HOSTS}")
   fi
   for host in $hosts;do
-    printf "$match_color\u25CF${reset} ${white}${host}${reset}\n"
-    total=$((total + 1))
+    if [ $host != $ip ]; then
+        printf "$match_color\u25CF${reset} ${white}${host}${reset}\n"
+        total=$((total + 1))
+    fi
   done
   msg_check "${white}total: ${yellow}${total}${reset}"
 }
@@ -240,26 +242,30 @@ hosts_fetch_updates() {
   root_check
   hosts_init
   local tmpfile=$(mktemp)
-  local tmpfile0=$(mktemp)
+  # local tmpfile0=$(mktemp)
   local n=0;
 
+
+  # Comment out line 247 and uncomment 248 if you wish to use wget rather than curl
   curl -o "${tmpfile}" -L "${remote_hosts}" -s
+  #wget -O "${tmpfile}" "${remote_hosts}"
 
   # Only allow entries in the new remote file which begin with the blocking IP
-  # address.
-  match_string="$(echo $ip | awk '{print substr($0,0,3)}')"
-  hosts=$(awk "{ if ( substr(\$0, 1, 3) == \"$match_string\" ) print \$0 >> \"${tmpfile0}\" }" "${tmpfile}")
+  # address (not currently working Ubuntu 17.04).
+  # match_string="$(echo $ip | awk '{print substr($0,0,3)}')"
+  # sed -n "/^$match_string/p" "${REMOTE_HOSTS}" >> "$tmpfile0"
 
   # If a previous remote hosts files exists, count the number of different
   # lines between the old and new files.
+  t=$(wc -l "${tmpfile}" | cut -d' ' -f1)
   if [ -f ${REMOTE_HOSTS} ]; then
-    n=$(diff -U 0 "${REMOTE_HOSTS}" "${tmpfile0}" | grep -v ^@ | tail -n +3 | wc -l)
+    n=$(diff -U 0 "${REMOTE_HOSTS}" "${tmpfile}" | grep -v ^@ | tail -n +3 | wc -l)
   else
-    n=$(wc -l "${tmpfile0}" | cut -d' ' -f1)
+    n="$t"
   fi
 
-  mv "${tmpfile0}" "${REMOTE_HOSTS}"
-  msg_check "update: ${purple}$n${reset} modified entries"
+  mv "${tmpfile}" "${REMOTE_HOSTS}"
+  msg_check "update: ${purple}$n${reset} modified entries, ${yellow}$t${reset} total entries."
 }
 
 # hosts_update: update the remote hosts and export to $HOSTS
