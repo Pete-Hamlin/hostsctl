@@ -1,5 +1,5 @@
-# 
-# Copyright (c) 2017 Levi Sabah <0xl3vi@gmail.com>
+#!/usr/bin/env bash
+# Copyright (c) 2017 hostsctl.sh authors and contributors
 # (https://git.io/hostsctl)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 #
 #
 
-PREFIX="/usr"
+PREFIX="/usr/local"
 
 root_check() {
   if [ $UID -ne 0 ];then
@@ -30,53 +30,38 @@ msg_info() {
   printf "<i> $1\n"
 }
 
-header() {
-cat << END
-     ._________________.
-     |.---------------.|
-     ||   Installing  ||
-     ||   ......      ||
-     ||   hostsctl.sh ||
-     ||     .......   ||
-     || ...........   ||
-     ||_______________||
-     /.-.-.-.-.-.-.-.-.\\
-    /.-.-.-.-.-.-.-.-.-.\\
-   /.-.-.-.-.-.-.-.-.-.-.\\
-  /______/__________\\___o_\\
-  \\_______________________/
-END
-}
-
 hostsctl_install() {
   local prefix="$1"
-  
-  header # just for fun (:
 
-  printf "\n=> progress: \n\n"
-  # Install files
-  cp -av etc/* "/etc/"  
-  cp -v bin/hostsctl.sh "${prefix}/bin/hostsctl"
+  printf "* Installing hostsctl ...\n"
+
+  printf "* " && cp -v bin/hostsctl.sh "${prefix}/bin/hostsctl"
   chmod +x "${prefix}/bin/hostsctl"
 
   # Install bash-completions
   # TODO: zsh-completions
   # ARCHLINUX
   if [ -f "/etc/arch-release" ];then
-    cp -v contrib/hostsctl.bash-completion "${prefix}/share/bash-completion/completions"
+    printf "* " && cp -v hostsctl.bash-completion "/usr/share/bash-completion/completions/hostsctl"
   fi
 
-  # Copy your original /etc/hosts to /etc/hostsctl.d/10-hosts
-  cp -v "/etc/hosts" "/etc/hostsctl.d/10-hosts"
-  
-  printf "\n"
-  # Update /etc/hostsctl.d/30-remote
-  sudo hostsctl update-remote
-  sudo hostsctl merge # Merge hosts
-   
-  printf "\ncongrats! hostsctl.sh installed on your system.\n\n"
-  echo "1. cd /etc/hostsctl.d/ : to manage your hosts"
-  echo "2. Full documentation at: <http://git.io/hostsctl>"
+  printf "\n* congrats! hostsctl.sh installed on your system.\n"
+  echo "* to get started, run hostsctl update"
+}
+
+hosts_uninstall() {
+  local prefix="$1"
+
+  printf "* Restoring old /etc/hosts file ...\n"
+  "${prefix}"/bin/hostsctl restore
+  printf "* Uninstalling hostsctl ...\n"
+  rm "${prefix}/bin/hostsctl"
+  rm -r /etc/hostsctl*
+
+  if [ -f "/etc/arch-release" ];then
+    rm "/usr/share/bash-completion/completions/hostsctl.bash-completion"
+  fi
+  printf "* hostsctl is no longer installed on your system.\n"
 }
 
 usage() {
@@ -86,19 +71,18 @@ Usage: $0 [--prefix] ...
 Install.sh will install hostsctl on your system.
 
 Arguments:
-  --prefix  set installation prefix (default: ${PREFIX})
-
-Full documentation at: <http://git.io/hostsctl>
+  --prefix   set installation prefix (default: ${PREFIX})
+  uninstall  uninstall hostsctl.
 EOF
 }
+
+root_check
 
 case $1 in
   --prefix)
     PREFIX="$2";;
+  uninstall)
+    hosts_uninstall "${PREFIX}";;
   *)
-    ;;
+    hostsctl_install "${PREFIX}"
 esac
-
-# Installation starts here
-root_check
-hostsctl_install "${PREFIX}"

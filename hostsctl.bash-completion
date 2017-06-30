@@ -1,17 +1,30 @@
 # hostsctl.sh: bash completions
-# (https://github.com/0xl3vi/hostsctl)
+# (https://github.com/pigmonkey/hostsctl)
 
+<<<<<<< HEAD
 __hostsctl()
 {
     local cur prev opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     opts="update-remote enable disable export list-enabled list-disabled merge --help"
+=======
+__hostsctl() {
+  local cur prev opts
+  _init_completion || return
+>>>>>>> ad0d052a991c7eea16b883f7b0d9ceff94a0659d
 
-    if [[ ${cur} == * ]] ; then
-	COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-        return 0
-    fi
-}
+  case $prev in
+    enable|disable)
+      _known_hosts_real "$cur"
+      return
+      ;;
+  esac
 
+  if [[ ${cur} == * ]] ; then
+    COMPREPLY=( $(compgen -W "fetch-updates enable disable export list-enabled list-disabled merge --help" -- ${cur}) )
+    return 0;
+  fi
+
+} &&
 complete -F __hostsctl hostsctl
