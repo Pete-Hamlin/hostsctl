@@ -22,7 +22,7 @@ __hostsctl() {
   esac
 
   if [[ ${cur} == * ]] ; then
-    COMPREPLY=( $(compgen -W "fetch-updates enable disable export list-enabled list-disabled merge --help" -- ${cur}) )
+    COMPREPLY=( $(compgen -W "update enable disable export list-enabled list-disabled merge --help" -- ${cur}) )
     return 0;
   fi
 

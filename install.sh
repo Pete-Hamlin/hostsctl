@@ -51,7 +51,7 @@ hostsctl_install() {
   fi
 
   printf "\n* congrats! hostsctl.sh installed on your system.\n"
-  echo "* to get started, run hostsctl update"
+  echo "* to get started, run hostsctl upgrade"
 }
 
 hosts_config() {

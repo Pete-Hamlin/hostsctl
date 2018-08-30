@@ -54,10 +54,10 @@ ip='0.0.0.0'
 
 ## Usage
 
-The simplest usage is to run `hostsctl update`. This will download the latest version of the remote hosts file, merge it together with other entries in `/etc/hostsctl` and output the results to `/etc/hosts`.
+The simplest usage is to run `hostsctl upgrade`. This will download the latest version of the remote hosts file, merge it together with other entries in `/etc/hostsctl` and output the results to `/etc/hosts`.
 
 ```bash
-$ sudo hostsctl update
+$ sudo hostsctl upgrade
 ```
 
 ### Enabling and Disabling Hosts
@@ -87,7 +87,7 @@ hostsctl is also able to update the remote hosts file and combine the various ho
 
 ```bash
 # Update the remote hosts file
-$ sudo hostsctl fetch-updates
+$ sudo hostsctl update
 # Export the all entries to stdout and compare them against the current /etc/hosts
 $ hostsctl export | diff -y --suppress-common-lines /etc/hosts - | less
 # After confirming the changes, save them to /etc/hosts
@@ -97,13 +97,13 @@ $ sudo hostsctl merge
 Similarly, this behaviour allows the host definitions to easily be stored elsewhere.
 
 ```bash
-$ sudo hostsctl fetch-updates && hostsctl export > ~/myhosts
+$ sudo hostsctl update && hostsctl export > ~/myhosts
 ```
 
 
 ## Example Hosts Files
 
-file   | by 
+file   | by
 -------|:------:
 [hosts](https://github.com/StevenBlack/hosts/blob/master/readme.md#list-of-all-hosts-file-variants) | StevenBlack/hosts
 [hosts](https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt) | AdAway

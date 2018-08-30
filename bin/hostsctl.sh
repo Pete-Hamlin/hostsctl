@@ -114,7 +114,7 @@ Arguments:
   disable [host]   disable specified host
   enable [host]    enable specified host
   export           export hosts to stdout
-  fetch-updates    update remote hosts without applying
+  update    update remote hosts without applying
   list-disabled    list disabled hosts
   list-enabled     list enabled hosts
   merge            merge hosts to ${HOSTS}
@@ -247,13 +247,14 @@ hosts_fetch_updates() {
 
 
   # Comment out line 247 and uncomment 248 if you wish to use wget rather than curl
-  curl -o "${tmpfile}" -L "${remote_hosts}" -s
-  #wget -O "${tmpfile}" "${remote_hosts}"
+  msg_info "Fetching list of hosts..."
+  curl -o "${tmpfile}" -L "${remote_hosts}" -s && msg_check "Done" || { msg_error "Failed to retreive hosts list, exiting update"; exit 1; }
+  #wget -O "${tmpfile}" "${remote_hosts}" && msg_check "Done" || { msg_error "Failed to retreive hosts list, exiting update"; exit 1; }
 
   # Only allow entries in the new remote file which begin with the blocking IP
   # address (not currently working Ubuntu 17.04).
-  # match_string="$(echo $ip | awk '{print substr($0,0,3)}')"
-  # sed -n "/^$match_string/p" "${REMOTE_HOSTS}" >> "$tmpfile0"
+  match_string="$(echo $ip | awk '{print substr($0,0,3)}')"
+  sed -n "/^$match_string/p" "${REMOTE_HOSTS}" >> "$tmpfile0"
 
   # If a previous remote hosts files exists, count the number of different
   # lines between the old and new files.
@@ -265,7 +266,7 @@ hosts_fetch_updates() {
   fi
 
   mv "${tmpfile}" "${REMOTE_HOSTS}"
-  msg_check "update: ${purple}$n${reset} modified entries, ${yellow}$t${reset} total entries."
+  msg_check "update: ${purple}$n${reset} new/modified entries, ${yellow}$t${reset} total entries."
 }
 
 # hosts_update: update the remote hosts and export to $HOSTS
