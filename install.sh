@@ -17,7 +17,7 @@
 #
 #
 
-PREFIX="/usr/local"
+PREFIX="/usr/local/bin"
 
 root_check() {
   if [ $UID -ne 0 ];then
@@ -35,8 +35,8 @@ hostsctl_install() {
 
   printf "* Installing hostsctl ...\n"
 
-  printf "* " && cp -v bin/hostsctl.sh "${prefix}/bin/hostsctl"
-  chmod +x "${prefix}/bin/hostsctl"
+  printf "* " && cp -v bin/hostsctl.sh "${prefix}/hostsctl"
+  chmod +x "${prefix}/hostsctl"
 
   # Install bash-completions
   # TODO: zsh-completions
@@ -45,7 +45,7 @@ hostsctl_install() {
     printf "* " && cp -v hostsctl.bash-completion "/usr/share/bash-completion/completions/hostsctl"
   # UBUNTU - definitely a tidier way of doing this, but such things are a little above me
   else [ -f "/etc/os-release"]
-    if grep -q 'NAME="Ubuntu"' os-release;then
+    if grep -q 'ID="Ubuntu"' os-release;then
         printf "* " && cp -v hostsctl.bash-completion "/usr/share/bash-completion/completions/hostsctl"
     fi
   fi

@@ -321,9 +321,9 @@ case $1 in
     hosts_merge;;
   export)
     hosts_export;;
-  update)
+  upgrade)
     hosts_update;;
-  fetch-updates)
+  update)
     hosts_fetch_updates;;
   list-enabled)
     hosts_list "enabled";;
