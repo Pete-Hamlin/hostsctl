@@ -44,8 +44,8 @@ hostsctl_install() {
   if [ -f "/etc/arch-release" ];then
     printf "* " && cp -v hostsctl.bash-completion "/usr/share/bash-completion/completions/hostsctl"
   # UBUNTU - definitely a tidier way of doing this, but such things are a little above me
-  else [ -f "/etc/os-release"]
-    if grep -q 'ID="Ubuntu"' os-release;then
+  else [ -f "/etc/os-release" ]
+    if grep -q 'ID="Ubuntu"' /etc/os-release;then
         printf "* " && cp -v hostsctl.bash-completion "/usr/share/bash-completion/completions/hostsctl"
     fi
   fi
